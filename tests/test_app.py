@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from fast_zero.schemas import UserPublic
+
 
 def test_root_dev_Retornar_ok_e_ola_mundo(client):
     response = client.get('/')
@@ -25,37 +27,88 @@ def test_create_user(client):
     }
 
 
-def test_get_users(client):
-    # depende do teste anterior para criar um usuário, isso será corrigido
-    response = client.get('/users/')
+def test_create_user_conflict_email(client, user):
+    user_data = {
+        'username': 'newuser',
+        'email': user.email,
+        'password': 'newpassword',
+    }
 
-    assert response.status_code == HTTPStatus.OK
+    response = client.post('/users/', json=user_data)
+
+    assert response.status_code == HTTPStatus.CONFLICT
     assert response.json() == {
-        'users': [
-            {
-                'id': 1,
-                'username': 'testuser',
-                'email': 'testuser@example.com',
-            }
-        ]
+        'detail': 'Email already registered'
     }
 
 
-def test_update_user(client):
-    # depende do teste anterior para criar um usuário, isso será corrigido
+def test_create_user_conflict_username(client, user):
+    user_data = {
+        'username': user.username,
+        'email': 'newemail@example.com',
+        'password': 'newpassword',
+    }
+
+    response = client.post('/users/', json=user_data)
+
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {
+        'detail': 'Username already registered'
+    }
+
+
+def test_get_users(client):
+    response = client.get('/users/')
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'users': []}
+
+
+def test_get_users_with_existing_user(client, user):
+    user_schema = UserPublic.model_validate(user).model_dump()
+    response = client.get('/users/')
+    assert response.json() == {'users': [user_schema]}
+
+
+def test_update_user(client, user):
     updated_user_data = {
         'username': 'updateduser',
         'email': 'updateduser@example.com',
         'password': 'updatedpassword',
     }
 
-    response = client.put('/users/1', json=updated_user_data)
+    response = client.put(f'/users/{user.id}', json=updated_user_data)
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
         'username': 'updateduser',
-        'id': 1,
+        'id': user.id,
         'email': 'updateduser@example.com',
+    }
+
+
+def test_update_user_conflict(client, user):
+    client.post(
+        '/users/',
+        json={
+            'username': 'anotheruser',
+            'email': 'anotheruser@example.com',
+            'password': 'anotherpassword',
+        },
+    )
+
+    response = client.put(
+        f'/users/{user.id}',
+        json={
+            'username': 'anotheruser',
+            'email': user.email,
+            'password': 'newpassword',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {
+        'detail': 'Username or email already registered'
     }
 
 
@@ -72,9 +125,8 @@ def test_update_user_not_found(client):
     assert response.json() == {'detail': 'User not found'}
 
 
-def test_delete_user(client):
-    # depende do teste anterior para criar um usuário, isso será corrigido
-    response = client.delete('/users/1')
+def test_delete_user(client, user):
+    response = client.delete(f'/users/{user.id}')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted successfully'}
