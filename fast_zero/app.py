@@ -55,6 +55,16 @@ def get_users(
     return {'users': users}
 
 
+@app.get('/users/{user_id}', response_model=UserPublic)
+def get_user(user_id: int, session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+        )
+    return user
+
+
 @app.put('/users/{user_id}', response_model=UserPublic)
 def update_user(
     user_id: int, user: UserSchema, session: Session = Depends(get_session)
