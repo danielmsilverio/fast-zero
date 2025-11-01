@@ -11,7 +11,7 @@ Apesar de já ter experiencia com desenvolvimento em FastAPI, resolvi reciclar o
 - ✅ _Integrando banco de dados à API_
 - ✅ _Autenticação e Autorização com JWT_
 - ✅ _Refatorando a estrutura do projeto_
-- ⏭️ _Tornando o projeto assíncrono_
+- ✅ _Tornando o projeto assíncrono_
 - ⏭️ _Tornando o sistema de autenticação robusto_
 - ⏭️ _Criando rotas CRUD para gerenciamento de tarefas_
 - ⏭️ _Dockerizando a nossa aplicação e introduzindo o PostgreSQL_

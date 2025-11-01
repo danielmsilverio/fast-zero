@@ -1,25 +1,27 @@
 from dataclasses import asdict
 
+import pytest
 from sqlalchemy import select
 
 from fast_zero.models import User
 
 
-def test_create_user(session, mock_db_time):
+@pytest.mark.asyncio
+async def test_create_user(session, mock_db_time):
     with mock_db_time(model=User) as time:
         new_user = User(
-            username='testuser',
+            username='test',
             password='testpassword',
             email='testuser@example.com',
         )
         session.add(new_user)
-        session.commit()
+        await session.commit()
 
-    user = session.scalar(select(User).where(User.username == 'testuser'))
+    user = await session.scalar(select(User).where(User.username == 'test'))
 
     assert asdict(user) == {
         'id': 1,
-        'username': 'testuser',
+        'username': 'test',
         'password': 'testpassword',
         'email': 'testuser@example.com',
         'created_at': time,
