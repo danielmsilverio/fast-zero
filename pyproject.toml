@@ -31,7 +31,7 @@ extend-exclude = ['migrations']
 
 [tool.ruff.lint]
 preview = true
-select = ['I', 'E', 'F', 'W', 'PL', 'PT']
+select = ['I', 'E', 'F', 'W', 'PL', 'PT', 'FAST']
 
 [tool.ruff.format]
 preview = true
