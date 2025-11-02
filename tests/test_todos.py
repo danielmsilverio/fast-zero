@@ -144,7 +144,7 @@ async def test_list_todos_with_title_filter_should_return_5_todos(
     await session.commit()
 
     response = client.get(
-        '/todos/?title=Test%20Todo',
+        '/todos/?title=Test todo',
         headers={'Authorization': f'Bearer {token}'},
     )
 
@@ -227,7 +227,7 @@ async def test_list_todos_filter_combined_should_return_5_todos(
     await session.commit()
 
     response = client.get(
-        '/todos/?title=Test Todo&description=combined&state=done',
+        '/todos/?title=Test&description=combined&state=done',
         headers={'Authorization': f'Bearer {token}'},
     )
 
