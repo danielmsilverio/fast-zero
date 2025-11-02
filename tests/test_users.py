@@ -124,7 +124,7 @@ def test_update_user_conflict(client, user, token):
     }
 
 
-def test_update_user_not_authorized(client, user, token):
+def test_update_user_not_authorized(client, outher_user, token):
     updated_user_data = {
         'username': 'updateduser',
         'email': 'updateduser@example.com',
@@ -132,7 +132,7 @@ def test_update_user_not_authorized(client, user, token):
     }
 
     response = client.put(
-        f'/users/{user.id + 1}',
+        f'/users/{outher_user.id}',
         json=updated_user_data,
         headers={'Authorization': f'Bearer {token}'},
     )
@@ -150,9 +150,10 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted successfully'}
 
 
-def test_delete_user_not_authorized(client, user, token):
+def test_delete_user_not_authorized(client, outher_user, token):
     response = client.delete(
-        f'/users/{user.id + 1}', headers={'Authorization': f'Bearer {token}'}
+        f'/users/{outher_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.FORBIDDEN
