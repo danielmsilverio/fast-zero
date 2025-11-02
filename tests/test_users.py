@@ -98,21 +98,12 @@ def test_update_user(client, user, token):
     }
 
 
-def test_update_user_conflict(client, user, token):
-    client.post(
-        '/users/',
-        json={
-            'username': 'anotheruser',
-            'email': 'anotheruser@example.com',
-            'password': 'anotherpassword',
-        },
-    )
-
+def test_update_user_conflict(client, user, other_user, token):
     response = client.put(
         f'/users/{user.id}',
         json={
-            'username': 'anotheruser',
-            'email': user.email,
+            'username': other_user.username,
+            'email': 'newemail@example.com',
             'password': 'newpassword',
         },
         headers={'Authorization': f'Bearer {token}'},
@@ -124,7 +115,7 @@ def test_update_user_conflict(client, user, token):
     }
 
 
-def test_update_user_not_authorized(client, outher_user, token):
+def test_update_user_not_authorized(client, other_user, token):
     updated_user_data = {
         'username': 'updateduser',
         'email': 'updateduser@example.com',
@@ -132,7 +123,7 @@ def test_update_user_not_authorized(client, outher_user, token):
     }
 
     response = client.put(
-        f'/users/{outher_user.id}',
+        f'/users/{other_user.id}',
         json=updated_user_data,
         headers={'Authorization': f'Bearer {token}'},
     )
@@ -150,9 +141,9 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted successfully'}
 
 
-def test_delete_user_not_authorized(client, outher_user, token):
+def test_delete_user_not_authorized(client, other_user, token):
     response = client.delete(
-        f'/users/{outher_user.id}',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 
